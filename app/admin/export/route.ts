@@ -25,6 +25,12 @@ function formatKST(date: Date) {
   return `${t.getUTCFullYear()}. ${t.getUTCMonth() + 1}. ${t.getUTCDate()} ${hour < 12 ? "오전" : "오후"} ${hour12}:${pad(t.getUTCMinutes())}:${pad(t.getUTCSeconds())}`;
 }
 
+// 기록된 시각이 12~14시면 점심, 17~19시면 저녁, 그 밖이면 빈칸
+function recordedShift(date: Date) {
+  const h = kst(date).getUTCHours();
+  return h >= 12 && h < 14 ? "점심" : h >= 17 && h < 19 ? "저녁" : "";
+}
+
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const from = parseDateKST(params.get("from") ?? "");
@@ -34,7 +40,7 @@ export async function GET(request: Request) {
 
   const records = await prisma.choolsuck.findMany({
     where: { createdAt: { gte: from.start, lt: to.end } },
-    include: { user: { select: { name: true, grade: true, shift: true } } },
+    include: { user: { select: { name: true, grade: true, day: true, shift: true } } },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
   });
 
@@ -46,9 +52,9 @@ export async function GET(request: Request) {
     r,
   }));
 
-  const lines = [["요일", "일시", "이름", "학년", "구분", "시간", "특이사항"].map(cell).join(",")];
+  const lines = [["요일", "일시", "시간", "이름", "학년", "구분", "담당 요일", "담당 시간", "특이사항"].map(cell).join(",")];
   for (const { at, kind, shift, r } of rows) {
-    lines.push([DAY_NAME[kst(at).getUTCDay()], formatKST(at), r.user.name, r.user.grade, kind, shift, r.detail].map(cell).join(","));
+    lines.push([DAY_NAME[kst(at).getUTCDay()], formatKST(at), recordedShift(at), r.user.name, r.user.grade, kind, DAY_NAME[r.user.day], shift, r.detail].map(cell).join(","));
   }
 
   // BOM을 붙여야 엑셀에서 한글이 깨지지 않는다

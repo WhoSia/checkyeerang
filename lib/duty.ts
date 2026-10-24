@@ -1,10 +1,10 @@
 export const SHIFT_LUNCH = 1;
 export const SHIFT_DINNER = 2;
 
-// 당번 시간대 (점심 12:30 ~ 13:00, 저녁 17:40 ~ 18:00)
+// 당번 시간대 (점심 12:30 ~ 13:00, 저녁 18:00 ~ 18:10)
 export const SHIFT_TIME: Record<number, string> = {
   [SHIFT_LUNCH]: "12:30 ~ 13:00",
-  [SHIFT_DINNER]: "17:40 ~ 18:00",
+  [SHIFT_DINNER]: "18:00 ~ 18:10",
 };
 
 export const SHIFT_LABEL: Record<number, string> = {
@@ -28,9 +28,9 @@ export function getCurrentShift(now: Date = new Date()) {
 
   const minutes = (Number(get("hour")) % 24) * 60 + Number(get("minute"));
 
-  // 점심 12:30 ~ 13:00, 저녁 17:40 ~ 18:00
+  // 점심 12:30 ~ 13:00, 저녁 18:00 ~ 18:10
   if (minutes >= 12 * 60 + 30 && minutes < 13 * 60) return { day, shift: SHIFT_LUNCH };
-  if (minutes >= 17 * 60 + 40 && minutes < 18 * 60) return { day, shift: SHIFT_DINNER };
+  if (minutes >= 18 * 60 && minutes < 18 * 60 + 10) return { day, shift: SHIFT_DINNER };
   return null;
 }
 
