@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Checkyeerang
 
-## Getting Started
+창원과학고등학교 도서부 출석 관리 웹 앱입니다. 도서관 Windows PC 한 대에서 사용하도록 설계하고 있습니다.
 
-First, run the development server:
+> 개발 중입니다. 현재 버전에는 관리자 인증이 구현되어 있지 않습니다. 실제 학생 정보로 운영하기 전에 권한 분리와 백업을 검증해야 합니다.
 
-```bash
+## Requirements
+
+- Node.js (Next.js 16 지원 버전)
+- PostgreSQL
+- npm
+
+## Development
+
+1. PostgreSQL에 별도 개발용 데이터베이스를 준비합니다.
+2. `.env`에 개발 DB의 `DATABASE_URL`을 설정합니다. 실제 비밀번호는 Git에 올리지 않습니다.
+3. 의존성을 설치하고 개발 DB 마이그레이션을 실행합니다.
+
+```powershell
+npm ci
+npx prisma generate
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 http://localhost:3000 을 엽니다. **운영 DB를 개발 환경에 연결하지 마세요.**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local Windows Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+도서관 PC에서만 사용할 때는 Next.js 서버를 루프백 주소로 제한합니다.
 
-## Learn More
+```powershell
+npm ci
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+`npm run start`는 `127.0.0.1:3000`에서 실행됩니다. PostgreSQL도 외부 네트워크에 공개하지 마세요.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**운영 주의사항**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Windows 학생용 계정에 DB 관리자 권한·서버 파일 수정 권한을 주지 않습니다.
+- 관리자 인증이 완성되기 전까지 학생이 사용할 수 있는 운영 환경에 배포하지 않습니다.
+- DB 마이그레이션 전에는 백업하고, 별도 DB에서 복구를 시험합니다.
+- 재부팅 후 서버 자동 시작, 절전 모드, 장애 복구 절차는 배포 전에 확인해야 합니다.
+- Prisma 마이그레이션은 개발 DB에서 검증한 뒤 운영 DB에 `migrate deploy`로 적용합니다.
 
-## Deploy on Vercel
+## Git Workflow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- 개발 저장소: https://github.com/WhoSia/checkyeerang (`main`)
+- 원본 저장소: https://github.com/pugmy/checkyeerang (`main`)
+- 개발은 개인 저장소의 `main`에서 진행합니다.
+- 동작을 확인한 변경만 원본 저장소에 전달합니다.
+- 커밋명은 `Fix Attendance`, `Restrict Admin Access`처럼 간결한 Title Case를 사용합니다.
+- GitHub Actions나 자동 배포는 사용하지 않습니다.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Operations To Finish
+
+- 관리자 인증 및 서버 측 접근 통제
+- 보충 승인과 미출석 연결
+- 시험 기간·휴일 등 일정 예외 처리
+- PostgreSQL 정기 백업 및 실제 복구 검증
+- 도서부장 인수인계 절차
