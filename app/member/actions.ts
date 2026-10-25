@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
 
 type MemberInput = { name: string; grade: number; day: number; shift: number };
 
@@ -14,6 +15,7 @@ function validate(data: MemberInput) {
 }
 
 export async function updateMember(id: number, data: MemberInput) {
+  await requireAdmin();
   const error = validate(data);
   if (error) return { ok: false, message: error };
   const name = data.name.trim();
@@ -32,6 +34,7 @@ export async function updateMember(id: number, data: MemberInput) {
 
 // 출석/보충/결석 기록이 부원을 참조하므로 함께 지운다
 export async function deleteMember(id: number) {
+  await requireAdmin();
   await prisma.$transaction([
     prisma.choolsuck.deleteMany({ where: { userId: id } }),
     prisma.user.deleteMany({ where: { id } }),
@@ -41,6 +44,7 @@ export async function deleteMember(id: number) {
 }
 
 export async function addMember(data: MemberInput) {
+  await requireAdmin();
   const error = validate(data);
   if (error) return { ok: false, message: error };
   const name = data.name.trim();
