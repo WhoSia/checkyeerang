@@ -56,6 +56,18 @@ npm run start
 - 커밋명은 `Fix Attendance`, `Restrict Admin Access`처럼 간결한 Title Case를 사용합니다.
 - GitHub Actions나 자동 배포는 사용하지 않습니다.
 
+## Admin Login
+
+관리자 기능은 기본적으로 차단됩니다. 최초 실행 전에 운영 PC에서 다음을 설정하세요.
+
+```powershell
+node scripts/create-admin-password.mjs
+```
+
+출력된 `ADMIN_PASSWORD_HASH`와 `ADMIN_SESSION_SECRET`을 운영 PC의 `.env.local`에 저장합니다. 비밀번호 원문과 환경변수는 Git에 올리지 마세요. 관리자 페이지(`/admin`)에 접근하면 로그인 화면으로 이동하며, 로그인 세션은 최대 8시간 유지됩니다.
+
+관리자 비밀번호는 도서부장에게만 전달하고, 인계 시 새 비밀번호와 세션 서명 키를 발급하세요. 현 버전은 단일 관리자만 지원하며 로그인 시도 제한, 로그인 감사 로그, Windows 계정 분리와 데이터 복구는 운영 투입 전 추가 검증이 필요합니다.
+
 ## Operations To Finish
 
 - 관리자 인증 및 서버 측 접근 통제
