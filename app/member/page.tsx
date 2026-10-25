@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import MemberRow from "./MemberRow";
 import { MemberListSkeleton } from "../Skeleton";
 import AddMember from "./AddMember";
+import { requireAdmin } from "@/lib/admin-auth";
 
 async function MemberList() {
   await connection();
@@ -39,7 +40,8 @@ async function MemberList() {
   );
 }
 
-export default function Member() {
+export default async function Member() {
+  await requireAdmin();
   return (
     <div className="flex w-full flex-col items-center">
       <div className="mb-4 flex w-full items-center justify-between gap-3">
