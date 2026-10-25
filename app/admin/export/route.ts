@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isAdmin } from "@/lib/admin-auth";
 import { parseDateKST, SHIFT_LABEL } from "@/lib/duty";
 
 // 엑셀에서 수식으로 실행되지 않게 하고, CSV 규칙에 맞게 따옴표로 감싼다
@@ -32,6 +33,7 @@ function recordedShift(date: Date) {
 }
 
 export async function GET(request: Request) {
+  if (!(await isAdmin())) return new Response("관리자 인증이 필요합니다.", { status: 401 });
   const params = new URL(request.url).searchParams;
   const from = parseDateKST(params.get("from") ?? "");
   const to = parseDateKST(params.get("to") ?? "");
