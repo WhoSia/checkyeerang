@@ -6,6 +6,8 @@ import { recordAbsencesToday } from "@/lib/absence";
 import DatePicker from "./DatePicker";
 import { AdminSkeleton } from "../Skeleton";
 import ExportCsv from "./ExportCsv";
+import { requireAdmin } from "@/lib/admin-auth";
+import { logoutAdmin } from "./login/actions";
 
 const DAY_LABEL = ["", "월", "화", "수", "목", "금"];
 
@@ -118,10 +120,11 @@ async function Attendance({ searchParams }: { searchParams: Promise<{ [key: stri
   );
 }
 
-export default function Admin({ searchParams }: PageProps<"/admin">) {
+export default async function Admin({ searchParams }: PageProps<"/admin">) {
+  await requireAdmin();
   return (
     <div className="flex w-full flex-col items-start">
-      <h1 className="mb-4 text-3xl font-extrabold">출석 관리</h1>
+      <div className="mb-4 flex w-full items-center justify-between gap-3"><h1 className="text-3xl font-extrabold">출석 관리</h1><form action={logoutAdmin}><button className="btn btn-ghost btn-sm" type="submit">로그아웃</button></form></div>
       <Suspense fallback={<AdminSkeleton />}>
         <Attendance searchParams={searchParams} />
       </Suspense>
